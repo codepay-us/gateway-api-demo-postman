@@ -1,6 +1,6 @@
 # Postman test script instructions
 
-The Postman test script written in JavaScript language can use the rich functions provided by Postman to conveniently test the PayCloud API, understand the process of integrating PayCloud rest API through HTTP, including adding and verifying signatures for calling payment gateway APIs.
+The Postman test script written in JavaScript language can use the rich functions provided by Postman to conveniently test the gateway API, understand the process of integrating gateway rest API through HTTP, including adding and verifying signatures for calling payment gateway APIs.
 
 The following steps provide a detailed description of how to add test scripts to your Postman tool.
 
