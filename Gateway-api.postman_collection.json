@@ -1,0 +1,99 @@
+{
+	"info": {
+		"_postman_id": "7b99140b-5bfd-4989-b9e2-7357620bd28e",
+		"name": "Gateway API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30073974",
+		"_collection_link": "https://restless-desert-264241.postman.co/workspace/CodePay~3ac0cad5-04a7-4faf-b397-21e73d164936/collection/30073974-7b99140b-5bfd-4989-b9e2-7357620bd28e?action=share&source=collection_link&creator=30073974"
+	},
+	"item": [
+		{
+			"name": "Order Query",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Obtain the current timestamp and set it to a variable\r",
+							"var time = Math.round(new Date().getTime());\r",
+							"pm.variables.set('timestamp', time);\r",
+							"\r",
+							"// Obtain JSON key from HTTP body\r",
+							"var param = JSON.parse(request.data);\r",
+							"var keys = [];\r",
+							"for (let k in param) {\r",
+							"    if (k == 'sign' || k == 'timestamp') {\r",
+							"        continue;\r",
+							"    }\r",
+							"    keys.push(k);\r",
+							"}\r",
+							"keys.push('timestamp');\r",
+							"\r",
+							"// Parameter ASCII sorting\r",
+							"keys.sort();\r",
+							"\r",
+							"// Value based on parameter name\r",
+							"var kv = [];\r",
+							"for (let k of keys) {\r",
+							"    if(param[k] == ''){\r",
+							"        continue;\r",
+							"    }\r",
+							"    if(k == 'timestamp'){\r",
+							"        kv.push(k + '=' + time);\r",
+							"    }else{\r",
+							"        kv.push(k + '=' + param[k]);\r",
+							"    }\r",
+							"}\r",
+							"\r",
+							"// Put together signature strings\r",
+							"var signStr = kv.join('&');\r",
+							"console.log(\"String to be signed is:  \" + signStr);\r",
+							"\r",
+							"// Loading ForgeJS\r",
+							"eval(pm.globals.get('FORGE_JS'));\r",
+							"\r",
+							"// Calculate signature\r",
+							"const privKeyStr = \"-----BEGIN RSA PRIVATE KEY-----\\n\" + pm.globals.get('APP_RSA_PRIVATE_KEY') + \"\\n-----END RSA PRIVATE KEY-----\";\r",
+							"var prk = forge.pki.privateKeyFromPem(privKeyStr);\r",
+							"const md = forge.md.sha256.create();\r",
+							"md.update(signStr, \"utf8\");\r",
+							"var signByte = prk.sign(md);\r",
+							"var sign = forge.util.encode64(signByte);\r",
+							"\r",
+							"// Place signature in environment variable\r",
+							"pm.variables.set('sign', sign);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"merchant_no\":\"312300000969\",\r\n    \"charset\":\"UTF-8\",\r\n    \"method\":\"order.query\",\r\n    \"format\":\"JSON\",\r\n    \"sign\":\"{{sign}}\",\r\n    \"app_id\":\"wz6012822ca2f1as78\",\r\n    \"sign_type\":\"RSA2\",\r\n    \"version\":\"1.0\",\r\n    \"merchant_order_no\":\"mapp1701763963536\",\r\n    \"timestamp\":\"{{timestamp}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://gw.codepay.us/api/entry",
+					"protocol": "https",
+					"host": [
+						"gw",
+						"codepay",
+						"us"
+					],
+					"path": [
+						"api",
+						"entry"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
